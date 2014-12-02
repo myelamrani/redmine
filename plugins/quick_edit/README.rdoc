@@ -1,0 +1,16 @@
+= Quick Edit
+
+Plugin's features:
+- You will able to be edit attributes(subject, start_date, etc) and custom fields from Context Menu of the issue.
+
+INSTALL:
+
+- Download the plugin to your plugins directory.
+
+  examples)
+  cd redmine/plugins/
+  git clone git://git.sourceforge.jp/gitroot/quickedit/quickedit.git
+
+- Restart your redmine.
+
+
