@@ -1,0 +1,14 @@
+<% Project.all.each do |project|  %>
+<p><label><%= project.name %></label>
+
+  <% project_safe=project.identifier.downcase.tr(" ","_") %>
+  <% labels = %w(White Silver Gray Black Red Maroon Yellow Olive
+     Lime Green Aqua Teal Blue Navy Fuchsia Purple) %>
+  <% colors = labels.map {|x| [ t(x) ,x.downcase,:class => x.downcase]} %>
+  
+  <%= select_tag("settings["+project_safe+"]",
+      options_for_select(colors,settings[project_safe]),
+      class: settings[project_safe] )%>
+</p>
+<% end %>
+

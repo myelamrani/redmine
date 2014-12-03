@@ -1,0 +1,95 @@
+a.white, select.white, option.white, div.white
+{
+    background-color: #ffffff;
+    color: #000000;
+}
+
+a.silver, select.silver, option.silver, div.silver
+{
+    background-color: #c0c0c0;
+    color: #000000;
+}
+
+a.gray, select.gray, option.gray, div.gray
+{
+    background-color: #808080;
+    color: #ffffff;
+}
+
+a.black, select.black, option.black, div.black
+{
+    background-color: #000000;
+    color: #ffffff;
+}
+
+a.red, select.red, option.red, div.red
+{
+    background-color: #ff0000;
+    color: #000000;
+}
+
+a.maroon, select.maroon, option.maroon, div.maroon
+{
+    background-color: #800000;
+    color: #ffffff;
+}
+
+a.yellow, select.yellow, option.yellow, div.yellow
+{
+    background-color: #ffff00;
+    color: #000000;
+}
+
+a.olive, select.olive, option.olive, div.olive
+{
+    background-color: #808000;
+    color: #ffffff;
+}
+
+a.lime, select.lime, option.lime, div.lime
+{
+    background-color: #00ff00;
+    color: #000000;
+}
+
+a.green, select.green, option.green, div.green
+{ 
+    background-color: #008000;
+    color: #ffffff;
+}
+
+a.aqua, select.aqua, option.aqua, div.aqua
+{
+    background-color: #00ffff;
+    color: #000000;
+}
+
+a.teal, select.teal, option.teal, div.teal
+{
+    background-color: #008080;
+    color: #ffffff;
+}
+
+a.blue, select.blue, option.blue, div.blue
+{
+    background-color: #0000ff;
+    color: #ffffff;
+}
+
+a.navy, select.navy, option.navy, div.navy
+{
+    background-color: #000080;
+    color: #ffffff;
+}
+
+a.fuchsia, select.fuchsia, option.fuchsia, div.fuchsia
+{
+    background-color: #ff00ff;
+    color: #000000;
+}
+
+a.purple, select.purple, option.purple, div.purple
+{
+    background-color: #800080;
+    color: #ffffff;
+}
