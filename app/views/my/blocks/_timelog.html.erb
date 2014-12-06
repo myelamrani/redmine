@@ -14,7 +14,7 @@ entries_by_day = entries.group_by(&:spent_on)
 <% end %>
 
 <div class="total-hours">
-<p><%= l(:label_total_time) %>: <%= html_hours("%d" % entries.sum(&:hours).to_f.floor) %>:<%= html_hours("%02d" % ((entries.sum(&:hours).to_f - entries.sum(&:hours).to_f.floor) * 60).to_i) %></p>
+<p><%= l(:label_total_time) %>: <%= html_hours("%d" % entries.sum(&:hours).to_f.floor) %> hours <%= html_hours("%02d" % ((entries.sum(&:hours).to_f - entries.sum(&:hours).to_f.floor) * 60).to_i) %> minutes.</p>
 </div>
 
 <% if entries.any? %>
