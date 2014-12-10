@@ -481,7 +481,8 @@ class ProjectTest < ActiveSupport::TestCase
     project = Project.generate!
     parent_version_1 = Version.generate!(:project => project)
     parent_version_2 = Version.generate!(:project => project)
-    assert_same_elements [parent_version_1, parent_version_2], project.rolled_up_versions
+    assert_equal [parent_version_1, parent_version_2].sort,
+      project.rolled_up_versions.sort
   end
 
   test "#rolled_up_versions should include versions for a subproject" do
@@ -491,11 +492,8 @@ class ProjectTest < ActiveSupport::TestCase
     subproject = Project.generate_with_parent!(project)
     subproject_version = Version.generate!(:project => subproject)
 
-    assert_same_elements [
-                          parent_version_1,
-                          parent_version_2,
-                          subproject_version
-                         ], project.rolled_up_versions
+    assert_equal [parent_version_1, parent_version_2, subproject_version].sort,
+      project.rolled_up_versions.sort
   end
 
   test "#rolled_up_versions should include versions for a sub-subproject" do
@@ -507,11 +505,8 @@ class ProjectTest < ActiveSupport::TestCase
     sub_subproject_version = Version.generate!(:project => sub_subproject)
     project.reload
 
-    assert_same_elements [
-                          parent_version_1,
-                          parent_version_2,
-                          sub_subproject_version
-                         ], project.rolled_up_versions
+    assert_equal [parent_version_1, parent_version_2, sub_subproject_version].sort,
+      project.rolled_up_versions.sort
   end
 
   test "#rolled_up_versions should only check active projects" do
@@ -524,7 +519,8 @@ class ProjectTest < ActiveSupport::TestCase
     project.reload
 
     assert !subproject.active?
-    assert_same_elements [parent_version_1, parent_version_2], project.rolled_up_versions
+    assert_equal [parent_version_1, parent_version_2].sort,
+      project.rolled_up_versions.sort
   end
 
   def test_shared_versions_none_sharing
@@ -649,6 +645,12 @@ class ProjectTest < ActiveSupport::TestCase
       project.enabled_module_names = %w(issue_tracking news)
       assert_equal %w(issue_tracking news), project.enabled_module_names.sort
     end
+  end
+
+  def test_enabled_modules_names_with_nil_should_clear_modules
+    p = Project.find(1)
+    p.enabled_module_names = nil
+    assert_equal [], p.enabled_modules
   end
 
   test "enabled_modules should define module by names and preserve ids" do
@@ -950,5 +952,24 @@ class ProjectTest < ActiveSupport::TestCase
     project = Project.generate!
     assert_equal [Role.anonymous], project.override_roles(Role.anonymous)
     assert_equal [Role.non_member], project.override_roles(Role.non_member)
+  end
+
+  def test_css_classes
+    p = Project.new
+    assert_kind_of String, p.css_classes
+    assert_not_include 'archived', p.css_classes.split
+    assert_not_include 'closed', p.css_classes.split
+  end
+
+  def test_css_classes_for_archived_project
+    p = Project.new
+    p.status = Project::STATUS_ARCHIVED
+    assert_include 'archived', p.css_classes.split
+  end
+
+  def test_css_classes_for_closed_project
+    p = Project.new
+    p.status = Project::STATUS_CLOSED
+    assert_include 'closed', p.css_classes.split
   end
 end

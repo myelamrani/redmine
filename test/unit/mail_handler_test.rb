@@ -328,7 +328,7 @@ class MailHandlerTest < ActiveSupport::TestCase
       )
     end
     user = User.order('id DESC').first
-    assert_same_elements [group1, group2], user.groups
+    assert_equal [group1, group2].sort, user.groups.sort
   end
 
   def test_created_user_should_not_receive_account_information_with_no_account_info_option
@@ -934,6 +934,12 @@ class MailHandlerTest < ActiveSupport::TestCase
       :issue => {:tracker => 'defect', :project => 'foo'},
       :unknown_user => 'create'
     }, options)
+  end
+
+  def test_safe_receive_should_rescue_exceptions_and_return_false
+    MailHandler.stubs(:receive).raises(Exception.new "Something went wrong")
+
+    assert_equal false, MailHandler.safe_receive
   end
 
   private

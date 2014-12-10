@@ -60,6 +60,7 @@ class Project < ActiveRecord::Base
 
   acts_as_nested_set :dependent => :destroy
   acts_as_attachable :view_permission => :view_files,
+                     :edit_permission => :manage_files,
                      :delete_permission => :manage_files
 
   acts_as_customizable
@@ -71,8 +72,7 @@ class Project < ActiveRecord::Base
   attr_protected :status
 
   validates_presence_of :name, :identifier
-  validates_uniqueness_of :identifier
-  validates_associated :repository, :wiki
+  validates_uniqueness_of :identifier, :if => Proc.new {|p| p.identifier_changed?}
   validates_length_of :name, :maximum => 255
   validates_length_of :homepage, :maximum => 255
   validates_length_of :identifier, :in => 1..IDENTIFIER_MAX_LENGTH
@@ -333,12 +333,13 @@ class Project < ActiveRecord::Base
   def archive
     # Check that there is no issue of a non descendant project that is assigned
     # to one of the project or descendant versions
-    v_ids = self_and_descendants.collect {|p| p.version_ids}.flatten
-    if v_ids.any? &&
+    version_ids = self_and_descendants.joins(:versions).pluck("#{Version.table_name}.id")
+
+    if version_ids.any? &&
       Issue.
         includes(:project).
         where("#{Project.table_name}.lft < ? OR #{Project.table_name}.rgt > ?", lft, rgt).
-        where("#{Issue.table_name}.fixed_version_id IN (?)", v_ids).
+        where(:fixed_version_id => version_ids).
         exists?
       return false
     end
@@ -367,7 +368,7 @@ class Project < ActiveRecord::Base
   # by the current user
   def allowed_parents
     return @allowed_parents if @allowed_parents
-    @allowed_parents = Project.where(Project.allowed_to_condition(User.current, :add_subprojects)).to_a
+    @allowed_parents = Project.allowed_to(User.current, :add_subprojects).to_a
     @allowed_parents = @allowed_parents - self_and_descendants
     if User.current.allowed_to?(:add_project, nil, :global => true) || (!new_record? && parent.nil?)
       @allowed_parents << nil
@@ -547,12 +548,6 @@ class Project < ActiveRecord::Base
       where("is_for_all = ? OR id IN (SELECT DISTINCT cfp.custom_field_id" +
         " FROM #{table_name_prefix}custom_fields_projects#{table_name_suffix} cfp" +
         " WHERE cfp.project_id = ?)", true, id)
-  end
-
-  # Returns an array of all custom fields enabled for project time entries
-  # (explictly associated custom fields and custom fields enabled for all projects)
-  def all_time_entry_custom_fields
-    @all_time_entry_custom_fields ||= (TimeEntryCustomField.for_all + time_entry_custom_fields).uniq.sort
   end
 
   def project

@@ -273,7 +273,8 @@ class IssuesController < ApplicationController
       if @copy
         issue = orig_issue.copy({},
           :attachments => params[:copy_attachments].present?,
-          :subtasks => params[:copy_subtasks].present?
+          :subtasks => params[:copy_subtasks].present?,
+          :link => link_copy?(params[:link_copy])
         )
       else
         issue = orig_issue
@@ -406,13 +407,14 @@ class IssuesController < ApplicationController
   def build_new_issue_from_params
     if params[:id].blank?
       @issue = Issue.new
-      @issue.init_journal(User.current)
       if params[:copy_from]
         begin
+          @issue.init_journal(User.current)
           @copy_from = Issue.visible.find(params[:copy_from])
+          @link_copy = link_copy?(params[:link_copy]) || request.get?
           @copy_attachments = params[:copy_attachments].present? || request.get?
           @copy_subtasks = params[:copy_subtasks].present? || request.get?
-          @issue.copy_from(@copy_from, :attachments => @copy_attachments, :subtasks => @copy_subtasks)
+          @issue.copy_from(@copy_from, :attachments => @copy_attachments, :subtasks => @copy_subtasks, :link => @link_copy)
         rescue ActiveRecord::RecordNotFound
           render_404
           return
@@ -484,6 +486,17 @@ class IssuesController < ApplicationController
       else
         raise ActiveRecord::Rollback
       end
+    end
+  end
+
+  def link_copy?(param)
+    case Setting.link_copied_issue
+    when 'yes'
+      true
+    when 'no'
+      false
+    when 'ask'
+      param == '1'
     end
   end
 end

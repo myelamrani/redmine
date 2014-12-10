@@ -20,48 +20,25 @@ require File.expand_path('../../../test_helper', __FILE__)
 class Redmine::ApiTest::UsersTest < Redmine::ApiTest::Base
   fixtures :users, :members, :member_roles, :roles, :projects
 
-  def setup
-    Setting.rest_api_enabled = '1'
+  test "GET /users.xml should return users" do
+    get '/users.xml', {}, credentials('admin')
+
+    assert_response :success
+    assert_equal 'application/xml', response.content_type
+    assert_select 'users' do
+      assert_select 'user', assigns(:users).size
+    end
   end
 
-  should_allow_api_authentication(:get, "/users.xml")
-  should_allow_api_authentication(:get, "/users.json")
-  should_allow_api_authentication(:post,
-    '/users.xml',
-     {:user => {
-        :login => 'foo', :firstname => 'Firstname', :lastname => 'Lastname',
-        :mail => 'foo@example.net', :password => 'secret123'
-      }},
-    {:success_code => :created})
-  should_allow_api_authentication(:post,
-    '/users.json',
-    {:user => {
-       :login => 'foo', :firstname => 'Firstname', :lastname => 'Lastname',
-       :mail => 'foo@example.net'
-    }},
-    {:success_code => :created})
-  should_allow_api_authentication(:put,
-    '/users/2.xml',
-    {:user => {
-        :login => 'jsmith', :firstname => 'John', :lastname => 'Renamed',
-        :mail => 'jsmith@somenet.foo'
-    }},
-    {:success_code => :ok})
-  should_allow_api_authentication(:put,
-    '/users/2.json',
-    {:user => {
-        :login => 'jsmith', :firstname => 'John', :lastname => 'Renamed',
-        :mail => 'jsmith@somenet.foo'
-    }},
-    {:success_code => :ok})
-  should_allow_api_authentication(:delete,
-    '/users/2.xml',
-    {},
-    {:success_code => :ok})
-  should_allow_api_authentication(:delete,
-    '/users/2.xml',
-    {},
-    {:success_code => :ok})
+  test "GET /users.json should return users" do
+    get '/users.json', {}, credentials('admin')
+
+    assert_response :success
+    assert_equal 'application/json', response.content_type
+    json = ActiveSupport::JSON.decode(response.body)
+    assert json.key?('users')
+    assert_equal assigns(:users).size, json['users'].size
+  end
 
   test "GET /users/:id.xml should return the user" do
     get '/users/2.xml'

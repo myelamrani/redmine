@@ -22,7 +22,8 @@ class ProjectsControllerTest < ActionController::TestCase
            :member_roles, :issues, :journals, :journal_details,
            :trackers, :projects_trackers, :issue_statuses,
            :enabled_modules, :enumerations, :boards, :messages,
-           :attachments, :custom_fields, :custom_values, :time_entries
+           :attachments, :custom_fields, :custom_values, :time_entries,
+           :wikis, :wiki_pages, :wiki_contents, :wiki_content_versions
 
   def setup
     @request.session[:user_id] = nil
@@ -72,6 +73,14 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index
     assert_template 'index'
     assert_select 'a[href=?]', '/time_entries', 0
+  end
+
+  test "#index by non-admin user with permission should show add project link" do
+    Role.find(1).add_permission! :add_project
+    @request.session[:user_id] = 2
+    get :index
+    assert_template 'index'
+    assert_select 'a[href=?]', '/projects/new'
   end
 
   test "#new by admin user should accept get" do
@@ -408,6 +417,20 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response 302
   end
 
+  def test_setting_with_wiki_module_and_no_wiki
+    Project.find(1).wiki.destroy
+    Role.find(1).add_permission! :manage_wiki
+    @request.session[:user_id] = 2
+
+    get :settings, :id => 1
+    assert_response :success
+    assert_template 'settings'
+
+    assert_select 'form[action=?]', '/projects/ecookbook/wiki' do
+      assert_select 'input[name=?]', 'wiki[start_page]'
+    end
+  end
+
   def test_update
     @request.session[:user_id] = 2 # manager
     post :update, :id => 1, :project => {:name => 'Test changed name',
@@ -605,5 +628,19 @@ class ProjectsControllerTest < ActionController::TestCase
   def test_body_should_have_project_css_class
     get :show, :id => 1
     assert_select 'body.project-ecookbook'
+  end
+
+  def test_project_menu_should_include_new_issue_link
+    @request.session[:user_id] = 2
+    get :show, :id => 1
+    assert_select '#main-menu a.new-issue[href="/projects/ecookbook/issues/new"]', :text => 'New issue'
+  end
+
+  def test_project_menu_should_not_include_new_issue_link_for_project_without_trackers
+    Project.find(1).trackers.clear
+
+    @request.session[:user_id] = 2
+    get :show, :id => 1
+    assert_select '#main-menu a.new-issue', 0
   end
 end

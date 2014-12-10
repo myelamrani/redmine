@@ -141,7 +141,7 @@ fa:
   general_csv_separator: ','
   general_csv_decimal_separator: '.'
   general_csv_encoding: UTF-8
-  general_pdf_fontname: freesans
+  general_pdf_fontname: DejaVuSans
   general_first_day_of_week: '6'
 
   notice_account_updated: حساب شما بروز شد.
@@ -1126,3 +1126,7 @@ fa:
   field_users_visibility: Users visibility
   label_users_visibility_all: All active users
   label_users_visibility_members_of_visible_projects: Members of visible projects
+  label_edit_attachments: Edit attached files
+  setting_link_copied_issue: Link issues on copy
+  label_link_copied_issue: Link copied issue
+  label_ask: Ask

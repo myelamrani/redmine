@@ -17,7 +17,7 @@
 
 require File.expand_path('../../test_helper', __FILE__)
 
-class LayoutTest < ActionDispatch::IntegrationTest
+class LayoutTest < Redmine::IntegrationTest
   fixtures :projects, :trackers, :issue_statuses, :issues,
            :enumerations, :users, :issue_categories,
            :projects_trackers,
@@ -36,9 +36,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "browsing to an unauthorized page should render the base layout" do
-    change_user_password('miscuser9', 'test1234')
-
-    log_user('miscuser9','test1234')
+    log_user('jsmith','jsmith')
 
     get "/admin"
     assert_response :forbidden

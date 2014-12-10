@@ -221,14 +221,6 @@ module ApplicationHelper
     link_to(name, "#", :onclick => onclick)
   end
 
-  def image_to_function(name, function, html_options = {})
-    html_options.symbolize_keys!
-    tag(:input, html_options.merge({
-        :type => "image", :src => image_path(name),
-        :onclick => (html_options[:onclick] ? "#{html_options[:onclick]}; " : "") + "#{function};"
-        }))
-  end
-
   def format_activity_title(text)
     h(truncate_single_line_raw(text, 100))
   end
@@ -395,26 +387,8 @@ module ApplicationHelper
     s.html_safe
   end
 
-  # Options for the new membership projects combo-box
-  def options_for_membership_project_select(principal, projects)
-    options = content_tag('option', "--- #{l(:actionview_instancetag_blank_option)} ---")
-    options << project_tree_options_for_select(projects) do |p|
-      {:disabled => principal.projects.to_a.include?(p)}
-    end
-    options
-  end
-
   def option_tag(name, text, value, selected=nil, options={})
     content_tag 'option', value, options.merge(:value => value, :selected => (value == selected))
-  end
-
-  # Truncates and returns the string as a single line
-  def truncate_single_line(string, *args)
-    ActiveSupport::Deprecation.warn(
-      "ApplicationHelper#truncate_single_line is deprecated and will be removed in Rails 4 poring")
-    # Rails 4 ActionView::Helpers::TextHelper#truncate escapes.
-    # So, result is broken.
-    truncate(string.to_s, *args).gsub(%r{[\r\n]+}m, ' ')
   end
 
   def truncate_single_line_raw(string, length)
@@ -1032,11 +1006,6 @@ module ApplicationHelper
     (blank ? [["(auto)", ""]] : []) + languages_options
   end
 
-  def label_tag_for(name, option_tags = nil, options = {})
-    label_text = l(("field_"+field.to_s.gsub(/\_id$/, "")).to_sym) + (options.delete(:required) ? @template.content_tag("span", " *", :class => "required"): "")
-    content_tag("label", label_text)
-  end
-
   def labelled_form_for(*args, &proc)
     args << {} unless args.last.is_a?(Hash)
     options = args.last
@@ -1240,11 +1209,6 @@ module ApplicationHelper
       end
     end
     super *sources, options
-  end
-
-  # TODO: remove this in 2.5.0
-  def has_content?(name)
-    content_for?(name)
   end
 
   def sidebar_content?

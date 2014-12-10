@@ -17,7 +17,7 @@
 
 require File.expand_path('../../test_helper', __FILE__)
 
-class ApplicationTest < ActionDispatch::IntegrationTest
+class ApplicationTest < Redmine::IntegrationTest
   include Redmine::I18n
 
   fixtures :projects, :trackers, :issue_statuses, :issues,
@@ -73,6 +73,17 @@ class ApplicationTest < ActionDispatch::IntegrationTest
     post '/issues'
     assert_response 422
     assert_include "Invalid form authenticity token.", response.body
+  ensure
+    ActionController::Base.allow_forgery_protection = false
+  end
+
+  def test_localization_should_be_set_correctly_on_invalid_token
+    ActionController::Base.allow_forgery_protection = true
+    Setting.default_language = 'en'
+    post 'issues', { }, 'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3'
+    assert_response 422
+    assert_equal :fr, current_language
+    assert_select "html[lang=?]", "fr"
   ensure
     ActionController::Base.allow_forgery_protection = false
   end

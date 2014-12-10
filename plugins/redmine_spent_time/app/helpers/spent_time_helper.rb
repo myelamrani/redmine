@@ -56,7 +56,9 @@ module SpentTimeHelper
     conditions = []
     arguments = {}
 
-    conditions << "#{TimeEntry.table_name}.spent_on BETWEEN :from AND :to"
+    if (from != nil and to != nil)
+      conditions << "#{TimeEntry.table_name}.spent_on BETWEEN :from AND :to"
+    end
     figure_out_date_range(from, to)
     arguments[:from] = @from
     arguments[:to] = @to

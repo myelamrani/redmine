@@ -15,16 +15,16 @@ class SpentTimeController < ApplicationController
   # * If the user only has permissions to see his own report, the users' combobox is filled with the user himself.
   def index
     @user = User.current
-    if (authorized_for?(:view_every_project_spent_time))
-      @users = User.find(:all, :conditions => ["status = 1"])
-    elsif (authorized_for?(:view_others_spent_time))
-      projects = User.current.projects
-      @users = []
-      projects.each { |project| @users.concat(project.users) }
-      @users.uniq!
-    else
-      @users = [@user]
-    end
+    #if (authorized_for?(:view_every_project_spent_time))
+    #  @users = User.find(:all, :conditions => ["status = 1"])
+    #elsif (authorized_for?(:view_others_spent_time))
+    #  projects = User.current.projects
+    #  @users = []
+    #  projects.each { |project| @users.concat(project.users) }
+    #  @users.uniq!
+    #else
+    #  @users = [@user]
+    #end
     params[:period] ||= "7_days"
     make_time_entry_report(nil, nil, User.current)
     @users.sort! { |a, b| a.name <=> b.name }
