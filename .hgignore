@@ -38,4 +38,4 @@ vendor/rails
 .bundle
 Gemfile.lock
 Gemfile.local
-
+repos/*
